@@ -16,9 +16,9 @@ def parse_args():
     )
     parser.add_argument(
         '--file',
-        default=f'/tmp/vesta-{os.getpid()}-{int(1000 * time())}.csv',
+        default=f'/tmp/vesta-{os.getpid()}-{int(1000 * time())}.json',
         type=str,
-        help='location to write the log. defaults to \'/tmp/vesta-<pid>-<unixtime>.csv\''
+        help='location to write the log as a json. defaults to \'/tmp/vesta-<pid>-<unixtime>.json\''
     )
     return parser.parse_args()
 
