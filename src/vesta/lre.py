@@ -14,7 +14,7 @@ def normalize_timestamps(timestamps, bucket_size_ms):
 
 def bucket_probes(probes, bucket_size_ms):
     """ sums the number of probe events for each probe into ts buckets """
-    probes = probes.copy(deep=True)
+    probes = probes.copy()
     probes['ts'] = normalize_timestamps(probes.event_time, bucket_size_ms)
     probes = probes.groupby(['ts', 'probe']).event_time.count()
     probes.name = 'events'
