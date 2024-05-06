@@ -23,13 +23,13 @@ def parse_args():
     return parser.parse_args()
 
 
-def get_dtrace_probes():
-    with open(os.path.join(os.path.dirname(__file__), 'dtrace_probes.txt')) as f:
-        return f.read().splitlines()
+# def get_dtrace_probes():
+#     with open(os.path.join(os.path.dirname(__file__), 'dtrace_probes.txt')) as f:
+#         return f.read().splitlines()
 
 
 def get_probes(probes):
-    dtrace_probes = get_dtrace_probes()
+    # dtrace_probes = get_dtrace_probes()
     if os.path.exists(probes):
         _, ext = os.path.splitext(probes)
         if ext == '.json':
@@ -41,15 +41,15 @@ def get_probes(probes):
                     return []
         else:
             with open(probes) as f:
-                probes = f.read().splitlines()
+                probes = list(filter(lambda l: len(l) > 0, f.read().splitlines()))
     else:
         probes = probes.split(',')
 
-    filtered_probes = set(dtrace_probes) & set(probes)
-    if set(filtered_probes) != set(probes):
-        print(f'removing unknown probes:')
-        print(' '.join(list(set(probes) - set(filtered_probes))))
-    return filtered_probes
+    # filtered_probes = set(dtrace_probes) & set(probes)
+    # if set(filtered_probes) != set(probes):
+    #     print(f'removing unknown probes:')
+    #     print(' '.join(list(set(probes) - set(filtered_probes))))
+    return probes
 
 
 def main():
