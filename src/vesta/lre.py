@@ -5,6 +5,14 @@ import os
 import pandas as pd
 
 
+def to_dataframe(probes):
+    df = []
+    for probe in probes:
+        for event in probes[probe]:
+            df.append([int(event['event_time']), probe])
+    return pd.DataFrame(data=df, columns=['event_time', 'probe'])
+
+
 def normalize_timestamps(timestamps, bucket_size_ms):
     """ normalizes ns timestamps to ms-bucketed timestamps """
     # TODO: this is producing strange behavior due to int division:
@@ -14,7 +22,7 @@ def normalize_timestamps(timestamps, bucket_size_ms):
 
 def bucket_probes(probes, bucket_size_ms):
     """ sums the number of probe events for each probe into ts buckets """
-    probes = probes.copy()
+    probes = to_dataframe(probes)
     probes['ts'] = normalize_timestamps(probes.event_time, bucket_size_ms)
     probes = probes.groupby(['ts', 'probe']).event_time.count()
     probes.name = 'events'
@@ -79,8 +87,10 @@ def synthesize_probes(probes):
     synthesized = pd.concat(synthesized, axis=1).reset_index()
     synthesized = synthesized.set_index('ts')
     synthesized.columns.name = 'event'
+    synthesized = synthesized.stack()
+    synthesized.name = 'depth'
 
-    return synthesized.stack()
+    return synthesized
 
 
 def parse_args():
@@ -88,6 +98,7 @@ def parse_args():
     parser.add_argument(
         '-b',
         '--bucket_size',
+        default=1000,
         type=int,
         help='millisecond bucketing size of data'
     )
@@ -105,9 +116,12 @@ def main():
     for file in args.files:
         with open(file, 'r') as f:
             data = json.load(f)
+        print(f'synthesizing data in {file}')
         probes = bucket_probes(data, args.bucket_size)
         lres = synthesize_probes(probes)
-        lres.to_csv('{}-lre.{}'.format(*os.path.splitext(file)))
+        csv_file = '{}.csv'.format(os.path.splitext(file)[0])
+        print(f'writing to {csv_file}')
+        lres.to_csv(csv_file)
 
 
 if __name__ == '__main__':
