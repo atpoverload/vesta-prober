@@ -14,13 +14,19 @@ def parse_args():
         '--probes',
         default='monitor__wait',
         type=str,
-        help='list of comma-delimited probe names or path to a file that contains a list of probe names'
+        help='list of comma-delimited probe names or path to a file that contains a list of probe names',
+    )
+    parser.add_argument(
+        '--bucket_size',
+        default=1000,
+        type=int,
+        help='millisecond bucketing size of data',
     )
     parser.add_argument(
         '--file',
         default=f'/tmp/vesta-{os.getpid()}-{int(1000 * time())}.json',
         type=str,
-        help='location to write the log as a json. defaults to \'/tmp/vesta-<pid>-<unixtime>.json\''
+        help='location to write the log as a json. defaults to \'/tmp/vesta-<pid>-<unixtime>.json\'',
     )
     return parser.parse_args()
 
