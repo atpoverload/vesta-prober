@@ -4,6 +4,8 @@ import os
 
 from time import time
 
+from vesta import lre
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description='vesta probe monitor')
@@ -41,7 +43,8 @@ def get_probes(probes):
                     return []
         else:
             with open(probes) as f:
-                probes = list(filter(lambda l: len(l) > 0, f.read().splitlines()))
+                probes = list(filter(lambda l: len(
+                    l) > 0, f.read().splitlines()))
     else:
         probes = probes.split(',')
 
@@ -80,8 +83,13 @@ def main():
     except KeyboardInterrupt:
         print(f'monitoring of pid {args.pid} ended by user')
     data = tracer.read()
-    with open(args.file, 'w') as f:
-        json.dump(data, f)
+    # print(f'writing probe data to {args.file}')
+    # with open(args.file, 'w') as f:
+    #     json.dump(data, f)
+    print('synthesizing probes')
+    probes = lre.bucket_probes(data, args.bucket_size)
+    lres = lre.synthesize_probes(probes)
+    lres.to_csv(args.file)
 
 
 if __name__ == '__main__':
